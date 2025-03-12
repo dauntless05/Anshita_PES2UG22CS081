@@ -1,36 +1,41 @@
 pipeline {
     agent any
-    stages {
-         stage('Clone repository') {
-             steps {
-                 checkout([$class: 'GitSCM',
-                 branches: [[name: '*/main']],
-                 userRemoteConfigs: [[url: 'https://github.com/dauntless05/Anshita_PES2UG22CS081_Jenkins.git']]])
-             }
-         }
 
+    stages {
         stage('Build') {
             steps {
-                build 'PES2UG22CS081'
-                sh 'g++ newfile.cpp -f output'  // (shoud be) sh 'g++ newfile.cpp -o output' 
+                script {
+                    echo "Building the application..."
+                    sh "make -C main clean && make -C main hello_exec"
+                }
             }
         }
 
         stage('Test') {
             steps {
-                sh './output'
+                script {
+                    echo "Running tests..."
+                    sh "./main/hello_exec"
+                }
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'deploy'
+                script {
+                    echo "Deploying application..."
+                    sh 'echo "Deployment successful!"'
+                }
             }
         }
     }
+
     post {
         failure {
-            error 'Pipeline failed'
+            echo "Pipeline failed"
+        }
+        success {
+            echo "Pipeline completed successfully!"
         }
     }
 }
